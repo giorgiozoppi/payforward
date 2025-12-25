@@ -1,0 +1,14 @@
+apiVersion: v2
+name: payforward-frontend
+description: PayForwardNow Frontend - React application for kindness platform
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - payforward
+  - kindness
+  - react
+  - frontend
+maintainers:
+  - name: PayForwardNow Team
+    email: team@payforwardnow.com

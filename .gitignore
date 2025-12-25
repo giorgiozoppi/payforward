@@ -1,0 +1,86 @@
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Backend
+backend/server
+backend/coverage.out
+backend/coverage.html
+*.test
+*.out
+
+# Frontend
+frontend/dist
+frontend/node_modules
+frontend/.vite
+frontend/.cache
+
+# IDE
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+*.log
+logs/
+*.pid
+*.seed
+*.pid.lock
+
+# Docker
+.docker/
+
+# OS
+Thumbs.db
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.bak
+*.swp
+
+# Build artifacts
+dist/
+build/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Test coverage
+coverage/
+*.cover
+.coverage
+.coverage.*
+htmlcov/
+
+# Dependencies
+vendor/
+node_modules/
+
+# Go specific
+go.work
+go.work.sum
+
+# Database data (for local development)
+*.db
+*.sqlite
+*.sqlite3
+
+# Secrets
+secrets/
+*.key
+*.pem
+*.cert
