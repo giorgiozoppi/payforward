@@ -1,4 +1,4 @@
-.PHONY: help up down restart logs clean backend frontend test build docker-build install
+.PHONY: help up down restart backend-up backend-down logs clean backend frontend test build docker-build install
 
 # Colors for output
 BLUE := \033[0;34m
@@ -13,7 +13,9 @@ help: ## Show this help message
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  $(GREEN)%-20s$(NC) %s\n", $$1, $$2}'
 
 up: ## Start all services
-	@echo "$(BLUE)Starting all services...$(NC)"
+	@echo "$(BLUE)Starting Keycloak services...$(NC)"
+	docker-compose -f keycloak.yml up -d
+	@echo "$(BLUE)Starting application services...$(NC)"
 	docker-compose up -d
 	@echo "$(GREEN)✓ Services started$(NC)"
 	@echo ""
@@ -25,29 +27,50 @@ up: ## Start all services
 
 down: ## Stop all services
 	@echo "$(BLUE)Stopping all services...$(NC)"
-	docker-compose down
+	docker compose down
+	docker compose -f keycloak.yml down
 	@echo "$(GREEN)✓ Services stopped$(NC)"
 
 restart: down up ## Restart all services
 
+backend-up: ## Start backend service (with dependencies)
+	@echo "$(BLUE)Starting Keycloak services...$(NC)"
+	docker compose -f keycloak.yml up -d
+	@echo "$(BLUE)Starting Neo4j...$(NC)"
+	docker compose up -d neo4j
+	@echo "$(BLUE)Starting backend...$(NC)"
+	docker compose up -d backend
+	@echo "$(GREEN)✓ Backend services started$(NC)"
+	@echo ""
+	@echo "$(YELLOW)Access points:$(NC)"
+	@echo "  Backend:   http://localhost:8080"
+	@echo "  Keycloak:  http://localhost:8180 (admin/admin)"
+	@echo "  Neo4j:     http://localhost:7474 (neo4j/password123)"
+
+backend-down: ## Stop backend service
+	@echo "$(BLUE)Stopping backend...$(NC)"
+	docker compose stop backend
+	@echo "$(GREEN)✓ Backend stopped$(NC)"
+
 logs: ## Show logs from all services
-	docker-compose logs -f
+	docker compose -f keycloak.yml -f docker-compose.yml logs -f
 
 logs-backend: ## Show backend logs
-	docker-compose logs -f backend
+	docker compose logs -f backend
 
 logs-frontend: ## Show frontend logs
-	docker-compose logs -f frontend
+	docker compose logs -f frontend
 
 logs-keycloak: ## Show Keycloak logs
-	docker-compose logs -f keycloak
+	docker compose -f keycloak.yml logs -f keycloak
 
 logs-neo4j: ## Show Neo4j logs
-	docker-compose logs -f neo4j
+	docker compose logs -f neo4j
 
 clean: ## Stop services and remove volumes
 	@echo "$(RED)Removing all services and volumes...$(NC)"
-	docker-compose down -v
+	docker compose down -v
+	docker compose -f keycloak.yml down -v
 	@echo "$(GREEN)✓ Cleanup complete$(NC)"
 
 install: ## Install dependencies
@@ -92,11 +115,16 @@ build: ## Build both backend and frontend
 
 docker-build: ## Build Docker images
 	@echo "$(BLUE)Building Docker images...$(NC)"
-	docker-compose build
+	docker compose -f keycloak.yml build
+	docker compose build
 	@echo "$(GREEN)✓ Docker images built$(NC)"
 
 ps: ## Show running services
-	docker-compose ps
+	@echo "$(BLUE)Keycloak services:$(NC)"
+	@docker compose -f keycloak.yml ps
+	@echo ""
+	@echo "$(BLUE)Application services:$(NC)"
+	@docker compose ps
 
 health: ## Check health of all services
 	@echo "$(BLUE)Checking service health...$(NC)"
